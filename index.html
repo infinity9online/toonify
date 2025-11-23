@@ -1,17 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Toonify – TOON ⇄ JSON Formatter & Converter</title>
+
+  <!-- Basic SEO -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Toonify is a fast, browser-based TOON ⇄ JSON formatter, converter, and inspector with tree view, auto-detect, copy, and shareable links." />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="description"
+    content="Toonify is a fast, browser-based TOON ⇄ JSON formatter, converter and inspector with auto-detect, tree view, sharing, and drag & drop." />
+  <link rel="canonical" href="https://toonify.tech/" />
+
+  <!-- Favicon / Logo -->
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- Open Graph (social preview) -->
   <meta property="og:title" content="Toonify – TOON ⇄ JSON Formatter" />
-  <meta property="og:description" content="Format and convert TOON ⇄ JSON in your browser. Auto-detect, tree view, shareable links, drag & drop, and more." />
+  <meta property="og:description"
+    content="Convert and inspect TOON ⇄ JSON in your browser. Auto-detect formats, format TOON, view JSON trees, and share links easily." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://example.com" />
-  <meta property="og:image" content="https://example.com/assets/logo-og.png" />
+  <meta property="og:url" content="https://toonify.tech/" />
+  <meta property="og:image" content="https://toonify.tech/assets/logo.svg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Toonify – TOON ⇄ JSON Formatter" />
+  <meta name="twitter:description"
+    content="Format & convert TOON ⇄ JSON with a clean UI, tree view, and shareable links." />
+  <meta name="twitter:image" content="https://toonify.tech/assets/logo.svg" />
+
+  <!-- App version -->
+  <meta name="toonify-version" content="1.0.0" />
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="toonify.tech" src="https://plausible.io/js/script.js"></script>
+
   <style>
     :root {
       --bg: #0f172a;
@@ -84,7 +108,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 1px rgba(15,23,42,0.7), 0 8px 18px rgba(15,23,42,0.7);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7), 0 8px 18px rgba(15, 23, 42, 0.7);
     }
 
     .brand-logo span {
@@ -133,8 +157,8 @@
     }
 
     .toolbar-left,
-    .toolbar-center,
-    .toolbar-right {
+      .toolbar-center,
+      .toolbar-right {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -277,7 +301,7 @@
     }
 
     .pane,
-    .tree-pane {
+      .tree-pane {
       display: flex;
       flex-direction: column;
       background: var(--bg-elevated);
@@ -289,7 +313,7 @@
     }
 
     .pane-header,
-    .tree-header {
+      .tree-header {
       padding: 6px 9px;
       border-bottom: 1px solid var(--border-soft);
       display: flex;
@@ -318,7 +342,7 @@
     }
 
     .pane-header-actions,
-    .tree-header-actions {
+      .tree-header-actions {
       display: flex;
       gap: 6px;
       align-items: center;
@@ -377,12 +401,12 @@
       margin-left: 4px;
     }
 
-    details > summary {
+    details>summary {
       cursor: pointer;
       list-style: none;
     }
 
-    details > summary::-webkit-details-marker {
+    details>summary::-webkit-details-marker {
       display: none;
     }
 
@@ -421,9 +445,17 @@
       flex-shrink: 0;
     }
 
-    .status-bar.success span.dot { background: var(--status-ok); }
-    .status-bar.error span.dot { background: var(--status-err); }
-    .status-bar.warn span.dot { background: var(--status-warn); }
+    .status-bar.success span.dot {
+      background: var(--status-ok);
+    }
+
+    .status-bar.error span.dot {
+      background: var(--status-err);
+    }
+
+    .status-bar.warn span.dot {
+      background: var(--status-warn);
+    }
 
     footer {
       padding: 5px 12px 8px;
@@ -459,10 +491,12 @@
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
         transform: scale(1);
       }
+
       40% {
         box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6);
         transform: scale(1.01);
       }
+
       100% {
         box-shadow: 0 0 0 1px var(--border);
         transform: scale(1);
@@ -473,10 +507,12 @@
       .toolbar {
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.3fr) minmax(0, 1.7fr);
       }
+
       .panes-wrapper {
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-rows: minmax(0, 1.4fr) minmax(0, 1.2fr);
       }
+
       .tree-pane {
         grid-column: 1 / span 2;
       }
@@ -486,23 +522,138 @@
       .toolbar {
         grid-template-columns: minmax(0, 1fr);
       }
+
       .toolbar-left,
       .toolbar-right {
         justify-content: flex-start;
       }
+
       .toolbar-center {
         justify-content: flex-start;
       }
+
       .panes-wrapper {
         grid-template-columns: minmax(0, 1fr);
         grid-template-rows: repeat(3, minmax(0, 1fr));
       }
+
       .tree-pane {
         grid-column: auto;
       }
     }
+
+    /* Feedback floating button + modal */
+    .feedback-fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      z-index: 50;
+      background: var(--accent);
+      color: #f9fafb;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.7);
+    }
+
+    .feedback-fab:hover {
+      background: var(--accent-soft);
+    }
+
+    .feedback-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 40;
+    }
+
+    .feedback-overlay[hidden] {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .feedback-overlay {
+        align-items: center;
+      }
+    }
+
+    .feedback-modal {
+      width: 100%;
+      max-width: 380px;
+      margin: 16px;
+      padding: 16px 16px 14px;
+      border-radius: 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+      position: relative;
+    }
+
+    .feedback-modal h2 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .feedback-modal p {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .feedback-modal label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .feedback-modal input,
+    .feedback-modal textarea {
+      width: 100%;
+      margin-top: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      padding: 7px 8px;
+      font-size: 12px;
+      resize: vertical;
+    }
+
+    .feedback-modal input:focus-visible,
+    .feedback-modal textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .feedback-close {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 13px;
+      border-radius: 999px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feedback-status {
+      margin-top: 6px;
+      font-size: 11px;
+      min-height: 14px;
+      color: var(--muted);
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div class="brand">
@@ -525,25 +676,14 @@
   <main>
     <div class="toolbar">
       <div class="toolbar-left">
-        <button
-          id="autoDetect"
-          class="primary"
-          title="Detect whether the left pane contains TOON or JSON and convert it"
-        >
+        <button id="autoDetect" class="primary"
+          title="Detect whether the left pane contains TOON or JSON and convert it">
           <span class="btn-icon">⚡</span> Auto-detect &amp; convert
         </button>
-        <button
-          id="clearAll"
-          class="small"
-          title="Clear both editors and the tree view"
-        >
+        <button id="clearAll" class="small" title="Clear both editors and the tree view">
           <span class="btn-icon">🧹</span> Clear
         </button>
-        <button
-          id="formatToon"
-          class="small"
-          title="Format TOON in the left pane (only when TOON is on the left)"
-        >
+        <button id="formatToon" class="small" title="Format TOON in the left pane (only when TOON is on the left)">
           <span class="btn-icon">🎯</span> Format TOON
         </button>
       </div>
@@ -553,11 +693,7 @@
           <span class="direction-pill-main">TOON ⇆ JSON</span>
           <div class="dir-labels">
             <span id="dirLeftLabel">Left: TOON</span>
-            <button
-              id="swapDirection"
-              class="small icon-btn"
-              title="Swap which side is TOON vs JSON (no conversion)"
-            >
+            <button id="swapDirection" class="small icon-btn" title="Swap which side is TOON vs JSON (no conversion)">
               <span class="btn-icon">⇄</span>
             </button>
             <span id="dirRightLabel">Right: JSON</span>
@@ -566,18 +702,10 @@
       </div>
 
       <div class="toolbar-right">
-        <button
-          id="toonToJson"
-          class="small"
-          title="Treat left as TOON and convert it to JSON on the right"
-        >
+        <button id="toonToJson" class="small" title="Treat left as TOON and convert it to JSON on the right">
           <span class="btn-icon">➡️</span> TOON → JSON
         </button>
-        <button
-          id="jsonToToon"
-          class="small"
-          title="Treat left as JSON and convert it to TOON on the right"
-        >
+        <button id="jsonToToon" class="small" title="Treat left as JSON and convert it to TOON on the right">
           <span class="btn-icon">⬅️</span> JSON → TOON
         </button>
 
@@ -588,11 +716,7 @@
           <label><input type="radio" name="indent" value="4" />4</label>
         </div>
 
-        <button
-          id="refreshTree"
-          class="small"
-          title="Re-parse and refresh the JSON tree view"
-        >
+        <button id="refreshTree" class="small" title="Re-parse and refresh the JSON tree view">
           <span class="btn-icon">🌳</span> Refresh tree
         </button>
       </div>
@@ -606,35 +730,20 @@
             <span class="badge" id="leftBadge">Input</span>
           </div>
           <div class="pane-header-actions">
-            <button
-              id="copyLeft"
-              class="small icon-btn"
-              title="Copy all text from the left pane"
-            >
+            <button id="copyLeft" class="small icon-btn" title="Copy all text from the left pane">
               <span class="btn-icon">📋</span>
             </button>
-            <button
-              id="downloadLeft"
-              class="small icon-btn"
-              title="Download left pane content as a file"
-            >
+            <button id="downloadLeft" class="small icon-btn" title="Download left pane content as a file">
               <span class="btn-icon">⬇️</span>
             </button>
-            <button
-              id="uploadLeftBtn"
-              class="small icon-btn"
-              title="Upload a file into the left pane"
-            >
+            <button id="uploadLeftBtn" class="small icon-btn" title="Upload a file into the left pane">
               <span class="btn-icon">⬆️</span>
             </button>
             <input type="file" id="uploadLeft" style="display:none" />
           </div>
         </div>
-        <textarea
-          id="left"
-          spellcheck="false"
-          placeholder="Paste TOON or JSON here. Auto-detect will figure it out. You can also drag &amp; drop a file or text."
-        ></textarea>
+        <textarea id="left" spellcheck="false"
+          placeholder="Paste TOON or JSON here. Auto-detect will figure it out. You can also drag &amp; drop a file or text."></textarea>
       </section>
 
       <section class="pane pane-right">
@@ -644,35 +753,19 @@
             <span class="badge" id="rightBadge">Output</span>
           </div>
           <div class="pane-header-actions">
-            <button
-              id="copyRight"
-              class="small icon-btn"
-              title="Copy all text from the right pane"
-            >
+            <button id="copyRight" class="small icon-btn" title="Copy all text from the right pane">
               <span class="btn-icon">📋</span>
             </button>
-            <button
-              id="downloadRight"
-              class="small icon-btn"
-              title="Download right pane content as a file"
-            >
+            <button id="downloadRight" class="small icon-btn" title="Download right pane content as a file">
               <span class="btn-icon">⬇️</span>
             </button>
-            <button
-              id="uploadRightBtn"
-              class="small icon-btn"
-              title="Upload a file into the right pane"
-            >
+            <button id="uploadRightBtn" class="small icon-btn" title="Upload a file into the right pane">
               <span class="btn-icon">⬆️</span>
             </button>
             <input type="file" id="uploadRight" style="display:none" />
           </div>
         </div>
-        <textarea
-          id="right"
-          spellcheck="false"
-          placeholder="Converted output will appear here."
-        ></textarea>
+        <textarea id="right" spellcheck="false" placeholder="Converted output will appear here."></textarea>
       </section>
 
       <section class="tree-pane">
@@ -701,11 +794,46 @@
   </main>
 
   <footer>
-    <span>Powered by <code>@toon-format/toon</code> · Toonify</span>
+    <span>
+      Powered by <code>@toon-format/toon</code> · Toonify
+      <span id="versionTag"></span>
+    </span>
     <span>Drag &amp; drop files or text · Works great on Vercel / Netlify</span>
   </footer>
 
+  <!-- Feedback FAB + Modal -->
+  <button id="feedbackFab" class="feedback-fab" title="Send feedback">
+    💬
+  </button>
+
+  <div id="feedbackOverlay" class="feedback-overlay" hidden>
+    <div class="feedback-modal">
+      <button id="feedbackClose" class="feedback-close" aria-label="Close feedback form">✕</button>
+      <h2>Send feedback</h2>
+      <p>Spotted a bug or have an idea? Tell me!</p>
+      <form id="feedbackForm">
+        <label>
+          Your email (optional)
+          <input type="email" id="feedbackEmail" placeholder="you@example.com" />
+        </label>
+        <label>
+          Message
+          <textarea id="feedbackMessage" required rows="4"
+            placeholder="Share any issue, suggestion, or general feedback..."></textarea>
+        </label>
+        <button type="submit" class="primary" style="width:100%;justify-content:center;">
+          🚀 Send feedback
+        </button>
+        <div id="feedbackStatus" class="feedback-status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
   <script type="module">
+    // 🔗 CHANGE THIS if you ever recreate your Apps Script
+    const FEEDBACK_ENDPOINT =
+      "https://script.google.com/macros/s/AKfycbx0hmD4T_O3KPM_e-seRqsymQ5A7ixdylQXnb_VhenwlEIk928AXtoROA_dnbjL5zj7/exec";
+
     import { encode, decode } from "https://cdn.jsdelivr.net/npm/@toon-format/toon/+esm";
 
     let leftIsToon = true;
@@ -725,6 +853,12 @@
     const dirRightLabel = document.getElementById("dirRightLabel");
     const paneLeftEl = document.querySelector(".pane-left");
     const paneRightEl = document.querySelector(".pane-right");
+    const versionMeta = document.querySelector('meta[name="toonify-version"]');
+    const versionTagEl = document.getElementById("versionTag");
+
+    if (versionMeta && versionTagEl) {
+      versionTagEl.textContent = ` · v${versionMeta.content}`;
+    }
 
     function setStatus(msg, type = "info") {
       statusEl.classList.remove("success", "error", "warn");
@@ -1021,6 +1155,7 @@
         toTextarea.value = JSON.stringify(obj, null, getIndent());
         setStatus("Converted TOON → JSON.", "success");
         renderTree();
+        if (window.plausible) window.plausible("convert_toon_to_json");
       } catch (e) {
         setStatus("TOON parse error: " + (e && e.message ? e.message : e), "error");
       }
@@ -1037,6 +1172,7 @@
         toTextarea.value = encode(obj);
         setStatus("Converted JSON → TOON.", "success");
         renderTree();
+        if (window.plausible) window.plausible("convert_json_to_toon");
       } catch (e) {
         setStatus("JSON parse error: " + (e && e.message ? e.message : e), "error");
       }
@@ -1052,12 +1188,14 @@
         JSON.parse(src);
         swapPanes(false);
         convertJsonToToon(left, right);
+        if (window.plausible) window.plausible("auto_detect_json_to_toon");
         return;
-      } catch (_) {}
+      } catch (_) { }
       try {
         decode(src);
         swapPanes(true);
         convertToonToJson(left, right);
+        if (window.plausible) window.plausible("auto_detect_toon_to_json");
       } catch (e) {
         setStatus("Could not auto-detect format (neither valid JSON nor TOON).", "error");
       }
@@ -1146,6 +1284,7 @@
       const url = buildShareUrl();
       window.history.replaceState(null, "", url);
       copyToClipboard(url, "share URL");
+      if (window.plausible) window.plausible("share_link");
     });
 
     document.getElementById("swapDirection").addEventListener("click", () => {
@@ -1156,6 +1295,63 @@
 
     setupDragAndDrop(left);
     setupDragAndDrop(right);
+
+    // --- Feedback UI ---
+    const feedbackFab = document.getElementById("feedbackFab");
+    const feedbackOverlay = document.getElementById("feedbackOverlay");
+    const feedbackClose = document.getElementById("feedbackClose");
+    const feedbackForm = document.getElementById("feedbackForm");
+    const feedbackEmail = document.getElementById("feedbackEmail");
+    const feedbackMessage = document.getElementById("feedbackMessage");
+    const feedbackStatus = document.getElementById("feedbackStatus");
+
+    function openFeedback() {
+      feedbackOverlay.hidden = false;
+      feedbackMessage.focus();
+    }
+
+    function closeFeedback() {
+      feedbackOverlay.hidden = true;
+      feedbackForm.reset();
+      feedbackStatus.textContent = "";
+    }
+
+    feedbackFab.addEventListener("click", openFeedback);
+    feedbackClose.addEventListener("click", closeFeedback);
+
+    feedbackOverlay.addEventListener("click", (e) => {
+      if (e.target === feedbackOverlay) closeFeedback();
+    });
+
+    feedbackForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = feedbackEmail.value.trim();
+      const message = feedbackMessage.value.trim();
+      if (!message) {
+        feedbackStatus.textContent = "Please enter a message.";
+        return;
+      }
+      feedbackStatus.textContent = "Sending...";
+      try {
+        await fetch(FEEDBACK_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            message,
+            page: window.location.href,
+            userAgent: navigator.userAgent,
+          }),
+        });
+        feedbackStatus.textContent = "Thanks! Feedback sent.";
+        feedbackMessage.value = "";
+        if (window.plausible) window.plausible("feedback_submitted");
+        setTimeout(closeFeedback, 1000);
+      } catch (err) {
+        console.error(err);
+        feedbackStatus.textContent = "Failed to send. Try again later.";
+      }
+    });
 
     function applyThemeOnLoad() {
       initThemeFromStorageOrParam();
@@ -1174,4 +1370,5 @@
     setStatus("Ready.", "info");
   </script>
 </body>
+
 </html>
