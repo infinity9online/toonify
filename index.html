@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Toonify – TOON ⇄ JSON Formatter & Converter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Toonify is a fast, browser-based TOON ⇄ JSON formatter, converter, and inspector with tree view, auto-detect, copy, and shareable links." />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <meta property="og:title" content="Toonify – TOON ⇄ JSON Formatter" />
+  <meta property="og:description" content="Format and convert TOON ⇄ JSON in your browser. Auto-detect, tree view, shareable links, drag & drop, and more." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://example.com" />
+  <meta property="og:image" content="https://example.com/assets/logo-og.png" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-elevated: #020617;
+      --border: #1f2937;
+      --border-soft: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --muted-strong: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #1d4ed8;
+      --chip-bg: #111827;
+      --status-ok: #22c55e;
+      --status-err: #ef4444;
+      --status-warn: #eab308;
+    }
+
+    body.light {
+      --bg: #f3f4f6;
+      --bg-elevated: #ffffff;
+      --border: #e5e7eb;
+      --border-soft: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --muted-strong: #4b5563;
+      --accent: #2563eb;
+      --accent-soft: #1d4ed8;
+      --chip-bg: #f3f4f6;
+      --status-ok: #16a34a;
+      --status-err: #dc2626;
+      --status-warn: #ca8a04;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #38bdf8 0, #2563eb 30%, #0f172a 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 1px rgba(15,23,42,0.7), 0 8px 18px rgba(15,23,42,0.7);
+    }
+
+    .brand-logo span {
+      font-size: 17px;
+      font-weight: 700;
+      color: #e5e7eb;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    header .tagline {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 12px 14px;
+      gap: 10px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.3fr) minmax(0, 1.8fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar-left,
+    .toolbar-center,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .toolbar-center {
+      justify-content: center;
+    }
+
+    .toolbar-right {
+      justify-content: flex-end;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--chip-bg);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition:
+        background 0.15s ease,
+        transform 0.05s ease,
+        box-shadow 0.15s ease,
+        opacity 0.15s ease;
+      box-shadow: 0 0 0 1px var(--border);
+      white-space: nowrap;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #f9fafb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+    }
+
+    button.small {
+      padding: 4px 9px;
+      font-size: 11px;
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    button.icon-btn {
+      padding-inline: 9px;
+    }
+
+    button:hover {
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.7);
+      transform: translateY(-0.5px);
+    }
+
+    button.primary:hover {
+      background: var(--accent-soft);
+    }
+
+    button.small:hover {
+      background: rgba(148, 163, 184, 0.12);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .indent-options {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .indent-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--chip-bg);
+    }
+
+    .indent-options input[type="radio"] {
+      accent-color: var(--accent);
+    }
+
+    .direction-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      font-size: 11px;
+      color: var(--muted-strong);
+    }
+
+    .direction-pill-main {
+      font-weight: 500;
+      font-size: 11px;
+    }
+
+    .dir-labels {
+      display: flex;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .dir-labels span {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      border: 1px solid var(--border-soft);
+    }
+
+    .panes-wrapper {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 2.1fr);
+      gap: 10px;
+      min-height: 0;
+      flex: 1;
+    }
+
+    .pane,
+    .tree-pane {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-elevated);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      min-height: 0;
+      position: relative;
+    }
+
+    .pane-header,
+    .tree-header {
+      padding: 6px 9px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pane-header-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted-strong);
+    }
+
+    .pane-header-actions,
+    .tree-header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      border: none;
+      resize: none;
+      padding: 10px 12px;
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-family: "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      outline: none;
+      tab-size: 2;
+    }
+
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
+    textarea.drag-over {
+      outline: 2px dashed var(--accent);
+      outline-offset: -4px;
+    }
+
+    .tree-body {
+      flex: 1;
+      padding: 8px 8px 10px;
+      overflow: auto;
+      font-family: "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+    }
+
+    .tree-node {
+      margin-left: 12px;
+    }
+
+    .tree-primitive {
+      white-space: pre;
+    }
+
+    .tree-key {
+      font-weight: 500;
+    }
+
+    .tree-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    details > summary {
+      cursor: pointer;
+      list-style: none;
+    }
+
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .summary-line::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 4px;
+      font-size: 9px;
+      transform-origin: center;
+      transition: transform 0.1s ease;
+    }
+
+    details[open] .summary-line::before {
+      transform: rotate(90deg);
+    }
+
+    .status-bar {
+      margin-top: 4px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 20px;
+    }
+
+    .status-bar span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #4b5563;
+      flex-shrink: 0;
+    }
+
+    .status-bar.success span.dot { background: var(--status-ok); }
+    .status-bar.error span.dot { background: var(--status-err); }
+    .status-bar.warn span.dot { background: var(--status-warn); }
+
+    footer {
+      padding: 5px 12px 8px;
+      font-size: 11px;
+      color: var(--muted-strong);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-soft);
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    footer code {
+      font-size: 11px;
+    }
+
+    footer a {
+      color: var(--muted-strong);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .swap-animate {
+      animation: swapFlash 0.22s ease-out;
+    }
+
+    @keyframes swapFlash {
+      0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
+        transform: scale(1);
+      }
+      40% {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6);
+        transform: scale(1.01);
+      }
+      100% {
+        box-shadow: 0 0 0 1px var(--border);
+        transform: scale(1);
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .toolbar {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.3fr) minmax(0, 1.7fr);
+      }
+      .panes-wrapper {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      }
+      .tree-pane {
+        grid-column: 1 / span 2;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .toolbar {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .toolbar-left,
+      .toolbar-right {
+        justify-content: flex-start;
+      }
+      .toolbar-center {
+        justify-content: flex-start;
+      }
+      .panes-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+      }
+      .tree-pane {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-logo"><span>T</span></div>
+      <div class="brand-text">
+        <h1>Toonify</h1>
+        <span class="tagline">TOON ⇄ JSON · Format · Inspect · Share</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="shareLink" class="small" title="Copy a URL with current data &amp; settings">
+        <span class="btn-icon">🔗</span> Share link
+      </button>
+      <button id="themeToggle" class="small" title="Toggle light / dark theme">
+        <span class="btn-icon">🌓</span> Toggle light mode
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button
+          id="autoDetect"
+          class="primary"
+          title="Detect whether the left pane contains TOON or JSON and convert it"
+        >
+          <span class="btn-icon">⚡</span> Auto-detect &amp; convert
+        </button>
+        <button
+          id="clearAll"
+          class="small"
+          title="Clear both editors and the tree view"
+        >
+          <span class="btn-icon">🧹</span> Clear
+        </button>
+        <button
+          id="formatToon"
+          class="small"
+          title="Format TOON in the left pane (only when TOON is on the left)"
+        >
+          <span class="btn-icon">🎯</span> Format TOON
+        </button>
+      </div>
+
+      <div class="toolbar-center">
+        <div class="direction-pill" title="Shows which format is on each side">
+          <span class="direction-pill-main">TOON ⇆ JSON</span>
+          <div class="dir-labels">
+            <span id="dirLeftLabel">Left: TOON</span>
+            <button
+              id="swapDirection"
+              class="small icon-btn"
+              title="Swap which side is TOON vs JSON (no conversion)"
+            >
+              <span class="btn-icon">⇄</span>
+            </button>
+            <span id="dirRightLabel">Right: JSON</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <button
+          id="toonToJson"
+          class="small"
+          title="Treat left as TOON and convert it to JSON on the right"
+        >
+          <span class="btn-icon">➡️</span> TOON → JSON
+        </button>
+        <button
+          id="jsonToToon"
+          class="small"
+          title="Treat left as JSON and convert it to TOON on the right"
+        >
+          <span class="btn-icon">⬅️</span> JSON → TOON
+        </button>
+
+        <div class="indent-options" title="Indent size for pretty-printed JSON">
+          <span>Indent:</span>
+          <label><input type="radio" name="indent" value="2" checked />2</label>
+          <label><input type="radio" name="indent" value="3" />3</label>
+          <label><input type="radio" name="indent" value="4" />4</label>
+        </div>
+
+        <button
+          id="refreshTree"
+          class="small"
+          title="Re-parse and refresh the JSON tree view"
+        >
+          <span class="btn-icon">🌳</span> Refresh tree
+        </button>
+      </div>
+    </div>
+
+    <div class="panes-wrapper">
+      <section class="pane pane-left">
+        <div class="pane-header">
+          <div class="pane-header-title">
+            <span id="leftTitle">TOON</span>
+            <span class="badge" id="leftBadge">Input</span>
+          </div>
+          <div class="pane-header-actions">
+            <button
+              id="copyLeft"
+              class="small icon-btn"
+              title="Copy all text from the left pane"
+            >
+              <span class="btn-icon">📋</span>
+            </button>
+            <button
+              id="downloadLeft"
+              class="small icon-btn"
+              title="Download left pane content as a file"
+            >
+              <span class="btn-icon">⬇️</span>
+            </button>
+            <button
+              id="uploadLeftBtn"
+              class="small icon-btn"
+              title="Upload a file into the left pane"
+            >
+              <span class="btn-icon">⬆️</span>
+            </button>
+            <input type="file" id="uploadLeft" style="display:none" />
+          </div>
+        </div>
+        <textarea
+          id="left"
+          spellcheck="false"
+          placeholder="Paste TOON or JSON here. Auto-detect will figure it out. You can also drag &amp; drop a file or text."
+        ></textarea>
+      </section>
+
+      <section class="pane pane-right">
+        <div class="pane-header">
+          <div class="pane-header-title">
+            <span id="rightTitle">JSON</span>
+            <span class="badge" id="rightBadge">Output</span>
+          </div>
+          <div class="pane-header-actions">
+            <button
+              id="copyRight"
+              class="small icon-btn"
+              title="Copy all text from the right pane"
+            >
+              <span class="btn-icon">📋</span>
+            </button>
+            <button
+              id="downloadRight"
+              class="small icon-btn"
+              title="Download right pane content as a file"
+            >
+              <span class="btn-icon">⬇️</span>
+            </button>
+            <button
+              id="uploadRightBtn"
+              class="small icon-btn"
+              title="Upload a file into the right pane"
+            >
+              <span class="btn-icon">⬆️</span>
+            </button>
+            <input type="file" id="uploadRight" style="display:none" />
+          </div>
+        </div>
+        <textarea
+          id="right"
+          spellcheck="false"
+          placeholder="Converted output will appear here."
+        ></textarea>
+      </section>
+
+      <section class="tree-pane">
+        <div class="tree-header">
+          <div class="pane-header-title">
+            <span>Tree view</span>
+            <span class="badge">JSON inspector</span>
+          </div>
+          <div class="tree-header-actions">
+            <span style="font-size:11px;color:var(--muted);">
+              Parses whichever pane currently holds JSON
+            </span>
+          </div>
+        </div>
+        <div id="treeView" class="tree-body">
+          <span style="color:var(--muted);">
+            Convert something to JSON to see a structured tree view here.
+          </span>
+        </div>
+      </section>
+    </div>
+
+    <div id="status" class="status-bar">
+      <span class="dot"></span><span> Ready.</span>
+    </div>
+  </main>
+
+  <footer>
+    <span>Powered by <code>@toon-format/toon</code> · Toonify</span>
+    <span>Drag &amp; drop files or text · Works great on Vercel / Netlify</span>
+  </footer>
+
+  <script type="module">
+    import { encode, decode } from "https://cdn.jsdelivr.net/npm/@toon-format/toon/+esm";
+
+    let leftIsToon = true;
+    const THEME_KEY = "toonifyTheme";
+
+    const left = document.getElementById("left");
+    const right = document.getElementById("right");
+    const leftTitle = document.getElementById("leftTitle");
+    const rightTitle = document.getElementById("rightTitle");
+    const leftBadge = document.getElementById("leftBadge");
+    const rightBadge = document.getElementById("rightBadge");
+    const statusEl = document.getElementById("status");
+    const treeViewEl = document.getElementById("treeView");
+    const themeToggleBtn = document.getElementById("themeToggle");
+    const shareLinkBtn = document.getElementById("shareLink");
+    const dirLeftLabel = document.getElementById("dirLeftLabel");
+    const dirRightLabel = document.getElementById("dirRightLabel");
+    const paneLeftEl = document.querySelector(".pane-left");
+    const paneRightEl = document.querySelector(".pane-right");
+
+    function setStatus(msg, type = "info") {
+      statusEl.classList.remove("success", "error", "warn");
+      if (type === "success") statusEl.classList.add("success");
+      if (type === "error") statusEl.classList.add("error");
+      if (type === "warn") statusEl.classList.add("warn");
+      const span = statusEl.querySelector("span:last-child");
+      if (span) span.textContent = " " + msg;
+    }
+
+    function getIndent() {
+      const checked = document.querySelector('input[name="indent"]:checked');
+      return checked ? parseInt(checked.value, 10) : 2;
+    }
+
+    function applyLayoutLabels() {
+      leftTitle.textContent = leftIsToon ? "TOON" : "JSON";
+      rightTitle.textContent = leftIsToon ? "JSON" : "TOON";
+      leftBadge.textContent = "Input";
+      rightBadge.textContent = "Output";
+      dirLeftLabel.textContent = "Left: " + (leftIsToon ? "TOON" : "JSON");
+      dirRightLabel.textContent = "Right: " + (leftIsToon ? "JSON" : "TOON");
+    }
+
+    function addSwapAnimation() {
+      paneLeftEl.classList.add("swap-animate");
+      paneRightEl.classList.add("swap-animate");
+      setTimeout(() => {
+        paneLeftEl.classList.remove("swap-animate");
+        paneRightEl.classList.remove("swap-animate");
+      }, 240);
+    }
+
+    function swapPanes(toonOnLeft) {
+      if (leftIsToon === toonOnLeft) return;
+      leftIsToon = toonOnLeft;
+      const tmp = left.value;
+      left.value = right.value;
+      right.value = tmp;
+      applyLayoutLabels();
+      addSwapAnimation();
+    }
+
+    function copyToClipboard(text, which) {
+      if (!text) {
+        setStatus(which + " is empty, nothing to copy.", "warn");
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => setStatus("Copied " + which + " to clipboard.", "success"))
+          .catch(() => setStatus("Failed to copy " + which + ".", "error"));
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          setStatus("Copied " + which + " to clipboard.", "success");
+        } catch {
+          setStatus("Failed to copy " + which + ".", "error");
+        }
+        document.body.removeChild(ta);
+      }
+    }
+
+    function downloadContent(filename, content) {
+      if (!content) {
+        setStatus("Nothing to download.", "warn");
+        return;
+      }
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatus("Downloaded " + filename + ".", "success");
+    }
+
+    function handleFileUpload(inputEl, targetTextarea) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      file
+        .text()
+        .then((text) => {
+          targetTextarea.value = text;
+          setStatus(`Loaded file "${file.name}".`, "success");
+          inputEl.value = "";
+        })
+        .catch(() => {
+          setStatus("Failed to read file.", "error");
+        });
+    }
+
+    function setupDragAndDrop(textarea) {
+      ["dragenter", "dragover"].forEach((ev) => {
+        textarea.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+          textarea.classList.add("drag-over");
+        });
+      });
+
+      ["dragleave", "dragend"].forEach((ev) => {
+        textarea.addEventListener(ev, () => {
+          textarea.classList.remove("drag-over");
+        });
+      });
+
+      textarea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        textarea.classList.remove("drag-over");
+        const dt = e.dataTransfer;
+        if (!dt) return;
+        if (dt.files && dt.files.length > 0) {
+          const file = dt.files[0];
+          file
+            .text()
+            .then((text) => {
+              textarea.value = text;
+              setStatus(`Loaded dropped file "${file.name}".`, "success");
+            })
+            .catch(() => setStatus("Failed to read dropped file.", "error"));
+        } else {
+          const text = dt.getData("text") || dt.getData("text/plain");
+          if (text) {
+            textarea.value = text;
+            setStatus("Loaded dropped text.", "success");
+          }
+        }
+      });
+    }
+
+    function renderTree() {
+      let jsonText;
+      if (leftIsToon) {
+        jsonText = right.value.trim();
+      } else {
+        jsonText = left.value.trim();
+      }
+
+      if (!jsonText) {
+        treeViewEl.innerHTML =
+          '<span style="color:var(--muted);">No JSON to render. Convert something first.</span>';
+        return;
+      }
+
+      let obj;
+      try {
+        obj = JSON.parse(jsonText);
+      } catch (e) {
+        treeViewEl.innerHTML =
+          '<span style="color:var(--status-err);">Invalid JSON: ' +
+          (e && e.message ? e.message : "Parse error") +
+          "</span>";
+        return;
+      }
+
+      treeViewEl.innerHTML = "";
+      const rootNode = buildTreeNode(obj, "(root)");
+      treeViewEl.appendChild(rootNode);
+    }
+
+    function buildTreeNode(value, key) {
+      const isObject = value && typeof value === "object" && !Array.isArray(value);
+      const isArray = Array.isArray(value);
+
+      if (!isObject && !isArray) {
+        const div = document.createElement("div");
+        div.className = "tree-node tree-primitive";
+        const keySpan = document.createElement("span");
+        keySpan.className = "tree-key";
+        keySpan.textContent = key + ": ";
+        const valSpan = document.createElement("span");
+        valSpan.textContent = JSON.stringify(value);
+        const typeSpan = document.createElement("span");
+        typeSpan.className = "tree-type";
+        typeSpan.textContent = typeof value;
+        div.appendChild(keySpan);
+        div.appendChild(valSpan);
+        div.appendChild(typeSpan);
+        return div;
+      }
+
+      const details = document.createElement("details");
+      details.className = "tree-node";
+      details.open = key === "(root)";
+
+      const summary = document.createElement("summary");
+      const line = document.createElement("span");
+      line.className = "summary-line";
+
+      const keySpan = document.createElement("span");
+      keySpan.className = "tree-key";
+      keySpan.textContent = key === "(root)" ? "(root)" : key;
+
+      const typeSpan = document.createElement("span");
+      typeSpan.className = "tree-type";
+      if (isArray) {
+        typeSpan.textContent = "array[" + value.length + "]";
+      } else {
+        typeSpan.textContent = "object{" + Object.keys(value).length + "}";
+      }
+
+      line.appendChild(keySpan);
+      line.appendChild(typeSpan);
+      summary.appendChild(line);
+      details.appendChild(summary);
+
+      const container = document.createElement("div");
+      if (isArray) {
+        value.forEach((item, idx) => {
+          container.appendChild(buildTreeNode(item, "[" + idx + "]"));
+        });
+      } else {
+        Object.keys(value).forEach((k) => {
+          container.appendChild(buildTreeNode(value[k], k));
+        });
+      }
+      details.appendChild(container);
+      return details;
+    }
+
+    function applyTheme(theme) {
+      if (theme === "light") {
+        document.body.classList.add("light");
+        themeToggleBtn.textContent = "Switch to dark mode";
+      } else {
+        document.body.classList.remove("light");
+        themeToggleBtn.textContent = "Switch to light mode";
+      }
+      localStorage.setItem(THEME_KEY, theme);
+    }
+
+    function initThemeFromStorageOrParam() {
+      const params = new URLSearchParams(window.location.search);
+      const urlTheme = params.get("theme");
+      const stored = localStorage.getItem(THEME_KEY);
+      const theme = urlTheme || stored || "dark";
+      applyTheme(theme === "light" ? "light" : "dark");
+    }
+
+    function buildShareUrl() {
+      const params = new URLSearchParams();
+      params.set("leftIsToon", leftIsToon ? "1" : "0");
+      params.set("indent", String(getIndent()));
+      params.set("theme", document.body.classList.contains("light") ? "light" : "dark");
+
+      if (left.value.trim()) {
+        params.set("dataLeft", left.value);
+      }
+      if (right.value.trim()) {
+        params.set("dataRight", right.value);
+      }
+
+      const base = window.location.origin + window.location.pathname;
+      return base + "?" + params.toString();
+    }
+
+    function loadFromUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const leftFlag = params.get("leftIsToon");
+      if (leftFlag === "0") leftIsToon = false;
+      else if (leftFlag === "1") leftIsToon = true;
+
+      const dataLeft = params.get("dataLeft");
+      const dataRight = params.get("dataRight");
+      if (dataLeft !== null) left.value = dataLeft;
+      if (dataRight !== null) right.value = dataRight;
+
+      const indent = params.get("indent");
+      if (indent && ["2", "3", "4"].includes(indent)) {
+        const radio = document.querySelector('input[name="indent"][value="' + indent + '"]');
+        if (radio) radio.checked = true;
+      }
+
+      applyLayoutLabels();
+    }
+
+    function convertToonToJson(fromTextarea, toTextarea) {
+      const src = fromTextarea.value.trim();
+      if (!src) {
+        setStatus("TOON input is empty.", "warn");
+        return;
+      }
+      try {
+        const obj = decode(src);
+        toTextarea.value = JSON.stringify(obj, null, getIndent());
+        setStatus("Converted TOON → JSON.", "success");
+        renderTree();
+      } catch (e) {
+        setStatus("TOON parse error: " + (e && e.message ? e.message : e), "error");
+      }
+    }
+
+    function convertJsonToToon(fromTextarea, toTextarea) {
+      const src = fromTextarea.value.trim();
+      if (!src) {
+        setStatus("JSON input is empty.", "warn");
+        return;
+      }
+      try {
+        const obj = JSON.parse(src);
+        toTextarea.value = encode(obj);
+        setStatus("Converted JSON → TOON.", "success");
+        renderTree();
+      } catch (e) {
+        setStatus("JSON parse error: " + (e && e.message ? e.message : e), "error");
+      }
+    }
+
+    function autoDetectAndConvert() {
+      const src = left.value.trim();
+      if (!src) {
+        setStatus("Left input is empty. Paste TOON or JSON first.", "warn");
+        return;
+      }
+      try {
+        JSON.parse(src);
+        swapPanes(false);
+        convertJsonToToon(left, right);
+        return;
+      } catch (_) {}
+      try {
+        decode(src);
+        swapPanes(true);
+        convertToonToJson(left, right);
+      } catch (e) {
+        setStatus("Could not auto-detect format (neither valid JSON nor TOON).", "error");
+      }
+    }
+
+    document.getElementById("toonToJson").addEventListener("click", () => {
+      swapPanes(true);
+      convertToonToJson(left, right);
+    });
+
+    document.getElementById("jsonToToon").addEventListener("click", () => {
+      swapPanes(false);
+      convertJsonToToon(left, right);
+    });
+
+    document.getElementById("autoDetect").addEventListener("click", autoDetectAndConvert);
+
+    document.getElementById("formatToon").addEventListener("click", () => {
+      if (!leftIsToon) {
+        setStatus("Format TOON works only when TOON is on the left.", "warn");
+        return;
+      }
+      const src = left.value.trim();
+      if (!src) {
+        setStatus("TOON input is empty.", "warn");
+        return;
+      }
+      try {
+        const obj = decode(src);
+        left.value = encode(obj);
+        setStatus("Formatted TOON.", "success");
+      } catch (e) {
+        setStatus("TOON format error: " + (e && e.message ? e.message : e), "error");
+      }
+    });
+
+    document.getElementById("clearAll").addEventListener("click", () => {
+      left.value = "";
+      right.value = "";
+      treeViewEl.innerHTML =
+        '<span style="color:var(--muted);">Cleared. Convert something to see the tree again.</span>';
+      setStatus("Cleared both editors.", "info");
+    });
+
+    document.getElementById("copyLeft").addEventListener("click", () => {
+      copyToClipboard(left.value, "left pane");
+    });
+    document.getElementById("copyRight").addEventListener("click", () => {
+      copyToClipboard(right.value, "right pane");
+    });
+
+    document.getElementById("downloadLeft").addEventListener("click", () => {
+      const ext = leftIsToon ? "toon" : "json";
+      downloadContent("left." + ext, left.value);
+    });
+    document.getElementById("downloadRight").addEventListener("click", () => {
+      const ext = leftIsToon ? "json" : "toon";
+      downloadContent("right." + ext, right.value);
+    });
+
+    document.getElementById("uploadLeftBtn").addEventListener("click", () => {
+      document.getElementById("uploadLeft").click();
+    });
+    document.getElementById("uploadRightBtn").addEventListener("click", () => {
+      document.getElementById("uploadRight").click();
+    });
+
+    document.getElementById("uploadLeft").addEventListener("change", (e) => {
+      handleFileUpload(e.target, left);
+    });
+    document.getElementById("uploadRight").addEventListener("change", (e) => {
+      handleFileUpload(e.target, right);
+    });
+
+    document.getElementById("refreshTree").addEventListener("click", () => {
+      renderTree();
+      setStatus("Tree view refreshed.", "info");
+    });
+
+    themeToggleBtn.addEventListener("click", () => {
+      const newTheme = document.body.classList.contains("light") ? "dark" : "light";
+      applyTheme(newTheme);
+    });
+
+    shareLinkBtn.addEventListener("click", () => {
+      const url = buildShareUrl();
+      window.history.replaceState(null, "", url);
+      copyToClipboard(url, "share URL");
+    });
+
+    document.getElementById("swapDirection").addEventListener("click", () => {
+      swapPanes(!leftIsToon);
+      setStatus("Swapped pane formats (no conversion).", "info");
+      renderTree();
+    });
+
+    setupDragAndDrop(left);
+    setupDragAndDrop(right);
+
+    function applyThemeOnLoad() {
+      initThemeFromStorageOrParam();
+    }
+
+    applyThemeOnLoad();
+    loadFromUrlParams();
+
+    if (!left.value.trim() && !right.value.trim()) {
+      left.value = `users[2]{id,name}:
+  1,Alice
+  2,Bob`;
+    }
+
+    renderTree();
+    setStatus("Ready.", "info");
+  </script>
+</body>
+</html>
